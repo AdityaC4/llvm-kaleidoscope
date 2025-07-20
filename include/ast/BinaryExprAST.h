@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ExprAST.h"
+#include <memory>
 
 /// BinaryExprAST - Expression class for a binary operator.
 class BinaryExprAST : public ExprAST {

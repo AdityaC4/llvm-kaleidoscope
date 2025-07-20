@@ -3,12 +3,12 @@
 #include "token.h"
 #include <string>
 
-static std::string IdentifierStr;
-static double NumVal;
-static int CurTok;
+extern std::string IdentifierStr;
+extern double NumVal;
+extern int CurTok;
 
 /// gettok - Return the next token from standard input.
-static int gettok();
+int gettok();
 
 /// getNextToken - Read another token from the standard input and put in CurTok
-static int getNextToken();
+int getNextToken();

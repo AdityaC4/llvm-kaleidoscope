@@ -1,6 +1,10 @@
 #include "lexer/lexer.h"
 
-static int gettok() {
+std::string IdentifierStr;
+double NumVal;
+int CurTok;
+
+int gettok() {
   static int LastChar = ' ';
 
   // skip whitespace
@@ -51,4 +55,4 @@ static int gettok() {
   return ThisChar;
 }
 
-static int getNextToken() { return CurTok = gettok(); }
+int getNextToken() { return CurTok = gettok(); }
