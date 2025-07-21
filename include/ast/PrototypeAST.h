@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast/ExprAST.h"
 #include <string>
 #include <vector>
 
@@ -15,4 +16,5 @@ public:
       : Name(Name), Args(std::move(Args)) {}
 
   const std::string &getName() const { return Name; }
+  llvm::Function *codegen();
 };
