@@ -18,8 +18,8 @@ llvm::Function *FunctionAST::codegen() {
     return (llvm::Function *)LogErrorV("Function cannot be redefined");
 
   // new basic block to start insertion
-  llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", TheFunction);
-  Builder.SetInsertPoint(BB);
+  llvm::BasicBlock *BB = llvm::BasicBlock::Create(*TheContext, "entry", TheFunction);
+  Builder->SetInsertPoint(BB);
 
   // record function arguments in the symbol table
   NamedValues.clear();
@@ -28,7 +28,7 @@ llvm::Function *FunctionAST::codegen() {
 
   if (llvm::Value *RetVal = Body->codegen()) {
     // finish the function
-    Builder.CreateRet(RetVal);
+    Builder->CreateRet(RetVal);
 
     // validate the code
     llvm::verifyFunction(*TheFunction);

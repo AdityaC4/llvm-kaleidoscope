@@ -1,13 +1,14 @@
 #include "kaleidoscope/kaleidoscope.h"
+#include <memory>
 
 // Object that owns the LLVM core data structures such as the type and constant
 // value tables.
-llvm::LLVMContext TheContext;
+std::unique_ptr<llvm::LLVMContext> TheContext;
 
 // Helper to make easy instruction generation
 // IRBuilder class template keeps track of current place to insert instructions
 // and has methods to create new instructions
-llvm::IRBuilder<> Builder(TheContext);
+std::unique_ptr<llvm::IRBuilder<>> Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
 
 /// Top-level setructure LLVM IR uses to contain code.
 /// contains functions and gloval variables.

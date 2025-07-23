@@ -8,6 +8,12 @@
 #include <llvm-14/llvm/IR/Module.h>
 #include <memory>
 
+void InitializeModule() {
+  TheContext = std::make_unique<llvm::LLVMContext>();
+  TheModule = std::make_unique<llvm::Module>("mah jit", *TheContext);
+  Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+}
+
 void HandleDefinition() {
   if (auto FnAST = ParseDefinition()) {
     if (auto *FnIR = FnAST->codegen()) {
@@ -78,7 +84,7 @@ int main() {
   fprintf(stderr, "ready> ");
   getNextToken();
 
-  TheModule = std::make_unique<llvm::Module>("My JIT", TheContext);
+  InitializeModule();
 
   MainLoop();
 

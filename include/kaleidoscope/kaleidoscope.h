@@ -15,7 +15,7 @@
 #include <memory>
 #include <string>
 
-extern llvm::LLVMContext TheContext;
-extern llvm::IRBuilder<> Builder;
+extern std::unique_ptr<llvm::LLVMContext> TheContext;
+extern std::unique_ptr<llvm::IRBuilder<>> Builder;
 extern std::unique_ptr<llvm::Module> TheModule;
 extern std::map<std::string, llvm::Value *> NamedValues;
