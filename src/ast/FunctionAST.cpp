@@ -5,17 +5,25 @@
 #include <string>
 
 llvm::Function *FunctionAST::codegen() {
-  // Check if previously declared with extern
-  llvm::Function *TheFunction = TheModule->getFunction(Proto->getName());
+  // // Check if previously declared with extern
+  // llvm::Function *TheFunction = TheModule->getFunction(Proto->getName());
+  //
+  // if (!TheFunction)
+  //   TheFunction = Proto->codegen();
+  //
+  // if (!TheFunction)
+  //   return nullptr;
+  //
+  // if (!TheFunction->empty())
+  //   return (llvm::Function *)LogErrorV("Function cannot be redefined");
 
-  if (!TheFunction)
-    TheFunction = Proto->codegen();
-
+  // Transfer ownership of the prototype to the FunctionProtos map
+  // keep a reference to it for use
+  auto &P = *Proto;
+  FunctionProtos[Proto->getName()] = std::move(Proto);
+  llvm::Function *TheFunction = getFunction(P.getName());
   if (!TheFunction)
     return nullptr;
-
-  if (!TheFunction->empty())
-    return (llvm::Function *)LogErrorV("Function cannot be redefined");
 
   // new basic block to start insertion
   llvm::BasicBlock *BB =

@@ -12,6 +12,7 @@
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/Reassociate.h"
 #include "llvm/Transforms/Scalar/SimplifyCFG.h"
+#include <llvm-18/llvm/ExecutionEngine/Orc/ThreadSafeModule.h>
 #include <llvm-18/llvm/Target/TargetMachine.h>
 #include <memory>
 
@@ -60,6 +61,9 @@ void HandleDefinition() {
       fprintf(stderr, "Read function definition: ");
       FnIR->print(llvm::errs());
       fprintf(stderr, "\n");
+      ExitOnErr(TheJIT->addModule(llvm::orc::ThreadSafeModule(
+          std::move(TheModule), std::move(TheContext))));
+      InitializeModuleAndManagers();
     }
   } else {
     getNextToken();
@@ -72,6 +76,7 @@ void HandleExtern() {
       fprintf(stderr, "Read extern: ");
       FnIR->print(llvm::errs());
       fprintf(stderr, "\n");
+      FunctionProtos[ProtoAST->getName()] = std::move(ProtoAST);
     }
   } else {
     getNextToken();
@@ -80,12 +85,26 @@ void HandleExtern() {
 
 void HandleTopLevelExpression() {
   if (auto FnAST = ParseTopLevelExpr()) {
-    if (auto *FnIR = FnAST->codegen()) {
-      fprintf(stderr, "Read top-level expression: ");
-      FnIR->print(llvm::errs());
-      fprintf(stderr, "\n");
+    if (FnAST->codegen()) {
+      // create a ResourceTracker to track JIT'd memory allocated to our
+      // anonymous expressions -- that way we can free it after execution.
+      auto RT = TheJIT->getMainJITDylib().createResourceTracker();
 
-      FnIR->eraseFromParent();
+      auto TSM = llvm::orc::ThreadSafeModule(std::move(TheModule),
+                                             std::move(TheContext));
+      ExitOnErr(TheJIT->addModule(std::move(TSM), RT));
+      InitializeModuleAndManagers();
+
+      // Search the JIT for the __anon_expr symbol
+      auto ExprSymbol = ExitOnErr(TheJIT->lookup("__anon_expr"));
+
+      // Get the symbol's address and cast it to the right type (takes no
+      // arguments, returns double) so we can call it as a native function.
+      double (*FP)() = ExprSymbol.getAddress().toPtr<double (*)()>();
+      fprintf(stderr, "Evaluated to %f\n", FP());
+
+      // Delete the anonymous expression module from the JIT
+      ExitOnErr(RT->remove());
     }
   } else {
     getNextToken();

@@ -4,7 +4,7 @@
 
 llvm::Value *CallExprAST::codegen() {
   // Check func name in global module table
-  llvm::Function *CalleeF = TheModule->getFunction(Callee);
+  llvm::Function *CalleeF = getFunction(Callee);
   if (!CalleeF)
     return LogErrorV("Unknown function referenced");
 

@@ -1,4 +1,5 @@
 #include "kaleidoscope/kaleidoscope.h"
+#include "ast/PrototypeAST.h"
 #include <memory>
 
 // Object that owns the LLVM core data structures such as the type and constant
@@ -29,3 +30,18 @@ std::unique_ptr<llvm::ModuleAnalysisManager> TheMAM;
 std::unique_ptr<llvm::PassInstrumentationCallbacks> ThePIC;
 std::unique_ptr<llvm::StandardInstrumentations> TheSI;
 std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
+std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
+
+llvm::Function *getFunction(std::string Name) {
+  // check if the function has already been added to current module
+  if (auto *F = TheModule->getFunction(Name))
+    return F;
+
+  // if not, check if we can codegen the declaration from existing prototype
+  auto FI = FunctionProtos.find(Name);
+  if (FI != FunctionProtos.end())
+    return FI->second->codegen();
+
+  // if no existing prototype
+  return nullptr;
+}

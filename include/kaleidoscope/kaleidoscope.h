@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast/PrototypeAST.h"
 #include "kaleidoscope/kaleidoscopeJIT.h"
 #include "llvm-14/llvm/IR/PassInstrumentation.h"
 #include "llvm/ADT/APFloat.h"
@@ -33,3 +34,6 @@ extern std::unique_ptr<llvm::ModuleAnalysisManager> TheMAM;
 extern std::unique_ptr<llvm::PassInstrumentationCallbacks> ThePIC;
 extern std::unique_ptr<llvm::StandardInstrumentations> TheSI;
 extern std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
+extern std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
+
+llvm::Function *getFunction(std::string Name);
