@@ -18,7 +18,8 @@ llvm::Function *FunctionAST::codegen() {
     return (llvm::Function *)LogErrorV("Function cannot be redefined");
 
   // new basic block to start insertion
-  llvm::BasicBlock *BB = llvm::BasicBlock::Create(*TheContext, "entry", TheFunction);
+  llvm::BasicBlock *BB =
+      llvm::BasicBlock::Create(*TheContext, "entry", TheFunction);
   Builder->SetInsertPoint(BB);
 
   // record function arguments in the symbol table
@@ -32,6 +33,9 @@ llvm::Function *FunctionAST::codegen() {
 
     // validate the code
     llvm::verifyFunction(*TheFunction);
+
+    // Optimize the function
+    TheFPM->run(*TheFunction, *TheFAM);
 
     return TheFunction;
   }

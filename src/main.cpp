@@ -6,9 +6,13 @@
 #include "kaleidoscope/kaleidoscope.h"
 
 #include "parser/parser.h"
+#include "llvm/Passes/PassBuilder.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/Reassociate.h"
+#include "llvm/Transforms/Scalar/SimplifyCFG.h"
+#include <llvm-18/llvm/Target/TargetMachine.h>
 #include <memory>
 
 static llvm::ExitOnError ExitOnErr;
@@ -38,6 +42,16 @@ void InitializeModuleAndManagers() {
   TheFPM->addPass(llvm::InstCombinePass());
   // Reassociate expressions.
   TheFPM->addPass(llvm::ReassociatePass());
+  // eliminate common subexpressions
+  TheFPM->addPass(llvm::GVNPass());
+  // simplify the control flow graph
+  TheFPM->addPass(llvm::SimplifyCFGPass());
+
+  // register analysis passes used in these transform passes.
+  llvm::PassBuilder PB;
+  PB.registerModuleAnalyses(*TheMAM);
+  PB.registerFunctionAnalyses(*TheFAM);
+  PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
 }
 
 void HandleDefinition() {

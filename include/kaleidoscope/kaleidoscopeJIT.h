@@ -25,6 +25,7 @@
 #include "llvm/ExecutionEngine/SectionMemoryManager.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LLVMContext.h"
+#include <llvm-18/llvm/ExecutionEngine/Orc/Shared/ExecutorSymbolDef.h>
 #include <memory>
 
 namespace llvm {
@@ -93,7 +94,10 @@ public:
     return CompileLayer.add(RT, std::move(TSM));
   }
 
-  Expected<JITEvaluatedSymbol> lookup(StringRef Name) {
+  // Expected<JITEvaluatedSymbol> lookup(StringRef Name) {
+  //   return ES->lookup({&MainJD}, Mangle(Name.str()));
+  // }
+  Expected<ExecutorSymbolDef> lookup(StringRef Name) {
     return ES->lookup({&MainJD}, Mangle(Name.str()));
   }
 };
