@@ -8,7 +8,7 @@ std::unique_ptr<llvm::LLVMContext> TheContext;
 // Helper to make easy instruction generation
 // IRBuilder class template keeps track of current place to insert instructions
 // and has methods to create new instructions
-std::unique_ptr<llvm::IRBuilder<>> Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+std::unique_ptr<llvm::IRBuilder<>> Builder;
 
 /// Top-level setructure LLVM IR uses to contain code.
 /// contains functions and gloval variables.
@@ -20,3 +20,12 @@ std::unique_ptr<llvm::Module> TheModule;
 /// keeps track of which values are defined in the current scope and what their
 /// LLVM representation is.
 std::map<std::string, llvm::Value *> NamedValues;
+
+std::unique_ptr<llvm::FunctionPassManager> TheFPM;
+std::unique_ptr<llvm::LoopAnalysisManager> TheLAM;
+std::unique_ptr<llvm::FunctionAnalysisManager> TheFAM;
+std::unique_ptr<llvm::CGSCCAnalysisManager> TheCGAM;
+std::unique_ptr<llvm::ModuleAnalysisManager> TheMAM;
+std::unique_ptr<llvm::PassInstrumentationCallbacks> ThePIC;
+std::unique_ptr<llvm::StandardInstrumentations> TheSI;
+std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;

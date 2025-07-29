@@ -1,17 +1,43 @@
 // lexer
+#include "kaleidoscope/kaleidoscopeJIT.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
 
 #include "kaleidoscope/kaleidoscope.h"
 
 #include "parser/parser.h"
-#include <llvm-14/llvm/IR/Module.h>
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Scalar/Reassociate.h"
 #include <memory>
 
-void InitializeModule() {
+static llvm::ExitOnError ExitOnErr;
+
+void InitializeModuleAndManagers() {
+  // open a new context and module
   TheContext = std::make_unique<llvm::LLVMContext>();
   TheModule = std::make_unique<llvm::Module>("mah jit", *TheContext);
+  TheModule->setDataLayout(TheJIT->getDataLayout());
+
+  // new builder
   Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+
+  // new pass and analysis managers
+  TheFPM = std::make_unique<llvm::FunctionPassManager>();
+  TheLAM = std::make_unique<llvm::LoopAnalysisManager>();
+  TheFAM = std::make_unique<llvm::FunctionAnalysisManager>();
+  TheCGAM = std::make_unique<llvm::CGSCCAnalysisManager>();
+  TheMAM = std::make_unique<llvm::ModuleAnalysisManager>();
+  ThePIC = std::make_unique<llvm::PassInstrumentationCallbacks>();
+  TheSI = std::make_unique<llvm::StandardInstrumentations>(
+      *TheContext, /*debug logging*/ true);
+  TheSI->registerCallbacks(*ThePIC, TheMAM.get());
+
+  // add transform passes
+  // "peephole" optimizations and bit-twiddling optimizations
+  TheFPM->addPass(llvm::InstCombinePass());
+  // Reassociate expressions.
+  TheFPM->addPass(llvm::ReassociatePass());
 }
 
 void HandleDefinition() {
@@ -75,6 +101,10 @@ void MainLoop() {
 }
 
 int main() {
+  llvm::InitializeNativeTarget();
+  llvm::InitializeNativeTargetAsmPrinter();
+  llvm::InitializeNativeTargetAsmParser();
+
   // declare precedence
   BinopPrecedence['<'] = 10;
   BinopPrecedence['+'] = 20;
@@ -84,11 +114,13 @@ int main() {
   fprintf(stderr, "ready> ");
   getNextToken();
 
-  InitializeModule();
+  TheJIT = ExitOnErr(llvm::orc::KaleidoscopeJIT::Create());
+
+  InitializeModuleAndManagers();
 
   MainLoop();
 
-  TheModule->print(llvm::errs(), nullptr);
+  // TheModule->print(llvm::errs(), nullptr);
 
   return 0;
 }
