@@ -6,14 +6,14 @@
 #include "kaleidoscope/kaleidoscope.h"
 
 #include "parser/parser.h"
+#include "llvm/ExecutionEngine/Orc/ThreadSafeModule.h"
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Support/TargetSelect.h"
+#include "llvm/Target/TargetMachine.h"
 #include "llvm/Transforms/InstCombine/InstCombine.h"
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/Reassociate.h"
 #include "llvm/Transforms/Scalar/SimplifyCFG.h"
-#include <llvm-18/llvm/ExecutionEngine/Orc/ThreadSafeModule.h>
-#include <llvm-18/llvm/Target/TargetMachine.h>
 #include <memory>
 
 static llvm::ExitOnError ExitOnErr;

@@ -1,7 +1,7 @@
 #include "ast/FunctionAST.h"
 #include "kaleidoscope/kaleidoscope.h"
 #include "logger/logger.h"
-#include <llvm-14/llvm/IR/Verifier.h>
+#include "llvm/IR/Verifier.h"
 #include <string>
 
 llvm::Function *FunctionAST::codegen() {

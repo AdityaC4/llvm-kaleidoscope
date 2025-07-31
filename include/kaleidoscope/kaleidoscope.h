@@ -2,7 +2,6 @@
 
 #include "ast/PrototypeAST.h"
 #include "kaleidoscope/kaleidoscopeJIT.h"
-#include "llvm-14/llvm/IR/PassInstrumentation.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Analysis/CGSCCPassManager.h"
@@ -14,6 +13,7 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/PassInstrumentation.h"
 #include "llvm/IR/PassManager.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
