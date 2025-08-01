@@ -4,6 +4,7 @@
 #include "ast/CallExprAST.h"
 #include "ast/ExprAST.h"
 #include "ast/FunctionAST.h"
+#include "ast/IfExprAST.h"
 #include "ast/NumberExprAST.h"
 #include "ast/PrototypeAST.h"
 #include "ast/VariableExprAST.h"
@@ -17,6 +18,7 @@ std::unique_ptr<ExprAST> ParseParenExpr();
 std::unique_ptr<ExprAST> ParseIdentifierExpr();
 std::unique_ptr<ExprAST> ParsePrimary();
 std::unique_ptr<ExprAST> ParseExpression();
+std::unique_ptr<ExprAST> ParseIfExpr();
 std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,
                                        std::unique_ptr<ExprAST> LHS);
 std::unique_ptr<PrototypeAST> ParsePrototype();
